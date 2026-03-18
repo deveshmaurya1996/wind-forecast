@@ -33,6 +33,7 @@ export default function DateRangePicker({
       <input
         type="datetime-local"
         value={toLocalInputValue(value)}
+        suppressHydrationWarning
         min={toMinMax(min)}
         max={toMinMax(max)}
         step={1800}

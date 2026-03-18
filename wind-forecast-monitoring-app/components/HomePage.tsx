@@ -113,6 +113,7 @@ export default function HomePage({
             <button
               onClick={fetchData}
               disabled={loading}
+              suppressHydrationWarning
               className="
                 flex items-center justify-center gap-2
                 bg-sky-500 hover:bg-sky-400 disabled:bg-sky-800
