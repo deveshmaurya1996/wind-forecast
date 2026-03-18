@@ -1,24 +1,41 @@
-import { NextResponse } from "next/server";
-import { fetchWindFor } from "@/lib/bmrs";
+import { NextRequest, NextResponse } from "next/server";
+import { fetchForecasts } from "@/lib/bmrs";
+import { toForecastPoints } from "@/lib/chart";
 
-export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+export const runtime    = "nodejs";
+export const maxDuration = 55;
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const from = searchParams.get("from");
-  const to = searchParams.get("to");
-  if (!from || !to) {
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
+  const start   = searchParams.get("start");
+  const end     = searchParams.get("end");
+  const horizon = parseFloat(searchParams.get("horizon") ?? "4");
+
+  if (!start || !end) {
     return NextResponse.json(
-      { error: "Query params 'from' and 'to' (ISO dates) required" },
+      { error: "start and end query params are required" },
       { status: 400 }
     );
   }
+
+  const fetchStart = new Date(
+    new Date(start).getTime() - 48 * 60 * 60 * 1000
+  ).toISOString();
+
   try {
-    const data = await fetchWindFor(from, to);
-    return NextResponse.json(data);
-  } catch (e) {
-    const message = e instanceof Error ? e.message : "Failed to fetch forecasts";
-    return NextResponse.json({ error: message }, { status: 502 });
+    const raw    = await fetchForecasts(fetchStart, end);
+    const points = toForecastPoints(
+      raw,
+      new Date(start),
+      new Date(end),
+      horizon
+    );
+    return NextResponse.json(points);
+  } catch (err) {
+    console.error("[/api/forecast]", err);
+    return NextResponse.json(
+      { error: "Failed to fetch forecasts from Elexon" },
+      { status: 502 }
+    );
   }
 }

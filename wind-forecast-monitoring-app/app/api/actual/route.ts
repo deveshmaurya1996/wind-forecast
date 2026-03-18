@@ -1,24 +1,31 @@
-import { NextResponse } from "next/server";
-import { fetchFuelHH } from "@/lib/bmrs";
+import { NextRequest, NextResponse } from "next/server";
+import { fetchActuals } from "@/lib/bmrs";
+import { toActualPoints } from "@/lib/chart";
 
-export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+export const runtime = "nodejs";
+export const maxDuration = 55;
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const from = searchParams.get("from");
-  const to = searchParams.get("to");
-  if (!from || !to) {
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
+  const start = searchParams.get("start");
+  const end   = searchParams.get("end");
+
+  if (!start || !end) {
     return NextResponse.json(
-      { error: "Query params 'from' and 'to' (ISO dates) required" },
+      { error: "start and end query params are required" },
       { status: 400 }
     );
   }
+
   try {
-    const data = await fetchFuelHH(from, to);
-    return NextResponse.json(data);
-  } catch (e) {
-    const message = e instanceof Error ? e.message : "Failed to fetch actuals";
-    return NextResponse.json({ error: message }, { status: 502 });
+    const raw    = await fetchActuals(start, end);
+    const points = toActualPoints(raw);
+    return NextResponse.json(points);
+  } catch (err) {
+    console.error("[/api/actual]", err);
+    return NextResponse.json(
+      { error: "Failed to fetch actuals from Elexon" },
+      { status: 502 }
+    );
   }
 }

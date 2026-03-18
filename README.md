@@ -65,29 +65,39 @@ The app uses Next.js API routes to proxy the Elexon BMRS API. Data is filtered t
 
 ### 2. Analysis notebooks (Python)
 
-**Prerequisites:** Python 3.10+ (e.g. `py` or `python3` on PATH).
+**Prerequisites:** Python 3.10+ (`py` or `python3`), network access for Elexon BMRS API.
 
 From the repo root:
 
 ```bash
-# One-time: create virtual environment and install dependencies
+# One-time setup
 py -m venv .venv
-.\.venv\Scripts\activate.bat   # cmd
+.\.venv\Scripts\Activate.ps1    # PowerShell
+# On cmd: .\.venv\Scripts\activate.bat
 # On macOS/Linux: source .venv/bin/activate
 pip install -r analysis/requirements.txt
+```
 
-# Start Jupyter
+**Option A — Jupyter (interactive):**
+
+```bash
 jupyter notebook
 ```
 
-In the browser, open `analysis/forecast_error_analysis.ipynb` and `analysis/wind_reliability_analysis.ipynb`, then use **Kernel → Restart & Run All** in each.
+Open `analysis/forecast_error_analysis.ipynb` and `analysis/wind_reliability_analysis.ipynb`, then **Kernel → Restart & Run All** in each.
 
-**Run notebooks from the command line (no browser):**
+**Option B — Command line (execute and save output):**
 
 ```bash
-.\.venv\Scripts\jupyter.exe nbconvert --to notebook --execute analysis/forecast_error_analysis.ipynb --output forecast_error_analysis_executed.ipynb
-.\.venv\Scripts\jupyter.exe nbconvert --to notebook --execute analysis/wind_reliability_analysis.ipynb --output wind_reliability_analysis_executed.ipynb
+cd Forecast
+.\.venv\Scripts\Activate.ps1
+jupyter nbconvert --to notebook --execute analysis/forecast_error_analysis.ipynb --output forecast_error_analysis.ipynb --ExecutePreprocessor.timeout=300
+jupyter nbconvert --to notebook --execute analysis/wind_reliability_analysis.ipynb --output wind_reliability_analysis.ipynb --ExecutePreprocessor.timeout=300
 ```
+
+Outputs overwrite the notebooks in place with executed results. PNGs are written to `analysis/`.
+
+**Data requirements:** Notebooks fetch live data from Elexon BMRS (Jan 2025+). Forecast error needs matched actuals+forecasts; wind reliability needs ≥1000 half-hourly records. If the API returns limited data, notebooks exit with a clear message.
 
 | Part      | Where to run from               | Command / URL                             |
 | --------- | ------------------------------- | ----------------------------------------- |

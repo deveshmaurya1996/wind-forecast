@@ -1,23 +1,46 @@
 
+export interface ElexonActualRecord {
+  startTime: string;     
+  settlementDate?: string;
+  settlementPeriod?: number;
+  fuelType: string;       
+  generation: number;       
+}
+
+export interface ElexonForecastRecord {
+  startTime:   string;   
+  publishTime: string;   
+  generation:  number;   
+}
+
 export interface ActualPoint {
-  startTime: string;  
+  startTime:  string;
   generation: number;
 }
 
 export interface ForecastPoint {
-  startTime: string;
+  startTime:   string;
   publishTime: string;
-  generation: number;
+  generation:  number;
+  fhHours:     number;   
 }
 
-export interface ChartPoint {
-  time: string;
-  actual?: number;
-  forecast?: number;
-  label: string; 
+export interface ChartRow {
+  startTime:  string;          
+  actual?:    number | null;
+  forecast?:  number | null;
+  fhHours?:   number;
 }
 
-export interface ChartDataResponse {
-  series: ChartPoint[];
-  error?: string;
+export interface ChartApiResponse {
+  rows:    ChartRow[];
+  metrics: ChartMetrics;
+}
+
+export interface ChartMetrics {
+  mae:    number | null;
+  rmse:   number | null;
+  mape:   number | null;
+  bias:   number | null;
+  count:  number;           
 }
