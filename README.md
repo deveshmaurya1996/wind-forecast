@@ -125,9 +125,3 @@ Dependencies are listed in `analysis/requirements.txt` (pandas, numpy, matplotli
   Ref: [BMRS API documentation](https://bmrs.elexon.co.uk/api-documentation/endpoint/datasets/WINDFOR/stream).
 
 APIs are public; no API key required for the stream endpoints used here.
-
----
-
-## AI tools
-
-AI tools were used to assist with implementation (e.g. boilerplate, API client structure, notebook layout). The analysis design, assumptions, and conclusions in the notebooks are human-authored; AI was used only for low-level help (e.g. library usage, syntax) as per the instructions.
